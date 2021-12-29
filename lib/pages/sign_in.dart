@@ -131,8 +131,8 @@ class _SigninPageState extends State<SigninPage> {
           try {
             UserCredential userCredential =
                 await firebaseAuth.signInWithEmailAndPassword(
-                    email: _emailController.text,
-                    password: _passwordController.text);
+                    email: _emailController.text.trim(),
+                    password: _passwordController.text.trim());
                 print(userCredential);
                 final snackBar = SnackBar(content: "Login Successful".text.make());
                 ScaffoldMessenger.of(context).showSnackBar(snackBar);

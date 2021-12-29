@@ -123,8 +123,8 @@ class _SignupPageState extends State<SignupPage> {
           try {
             UserCredential userCredential =
                 await firebaseAuth.createUserWithEmailAndPassword(
-                    email: _emailController.text,
-                    password: _passwordController.text);
+                    email: _emailController.text.trim(),
+                    password: _passwordController.text.trim());
             final snackBar =
                 SnackBar(content: "Account Creation Successful".text.make());
                 
