@@ -8,14 +8,6 @@ class HomePage extends StatelessWidget {
   static FirebaseAuth firebaseAuth = FirebaseAuth.instance;
 
 
-  void SignUp() async {
-    try {
-      await firebaseAuth.createUserWithEmailAndPassword(
-          email: "ash@gmail.com", password: "test123");
-    } catch (e) {
-      print(e);
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,14 +15,7 @@ class HomePage extends StatelessWidget {
       appBar: AppBar(
           title: "Todo App".text.make(),
           backgroundColor: Colors.purple.shade900),
-      body: Center(
-        child: Container(
-          child: ElevatedButton(
-            onPressed: ()  => SignUp(),
-            child: "SignUp".text.make()
-        )
-        ),
-      ),
+      body: "HELLO".text.bold.xl.center.make(),
     );
   }
 }

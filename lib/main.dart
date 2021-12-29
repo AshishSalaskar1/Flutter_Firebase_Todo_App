@@ -21,7 +21,8 @@ class MyApp extends StatelessWidget {
       routes: {
         "/": (context) => HomePage(),
         MyRoutes.SignupRoute : (context) => SignupPage(),
-        MyRoutes.SigninRoute : (context) => SigninPage() 
+        MyRoutes.SigninRoute : (context) => SigninPage(),
+        MyRoutes.HomePageRoute : (context) => HomePage() 
       },
     );
   }

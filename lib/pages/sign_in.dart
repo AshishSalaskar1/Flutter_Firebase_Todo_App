@@ -14,6 +14,12 @@ class SigninPage extends StatefulWidget {
 }
 
 class _SigninPageState extends State<SigninPage> {
+  FirebaseAuth firebaseAuth = FirebaseAuth.instance;
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  bool loadCircle = false;
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,11 +43,11 @@ class _SigninPageState extends State<SigninPage> {
               SizedBox(height: 25),
               "OR".text.white.bold.make(),
               SizedBox(height: 25),
-              LoginTextField(context, "Email"),
+              LoginTextField(context, "Email", _emailController, false),
               SizedBox(height: 15),
-              LoginTextField(context, "Password"),
+              LoginTextField(context, "Password",_passwordController, true),
               SizedBox(height: 20),
-              SignUpButton(context),
+              loadCircle ? CircularProgressIndicator() : SignUpButton(context),
               SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -86,21 +92,21 @@ class _SigninPageState extends State<SigninPage> {
     ).wFourFifth(context);
   }
 
-  Widget LoginTextField(
-      BuildContext context, String label) {
+  Widget LoginTextField(BuildContext context, String label,
+      TextEditingController textController, bool isObscure) {
     return Container(
       height: 55,
       child: TextFormField(
+        obscureText: isObscure,
+        controller: textController,
         style: TextStyle(color: Colors.white),
         cursorColor: Colors.white,
         decoration: InputDecoration(
           labelText: "Enter ${label}",
-          labelStyle:
-              TextStyle(color: Colors.white, fontSize: 16),
+          labelStyle: TextStyle(color: Colors.white, fontSize: 16),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(15),
-            borderSide:
-                BorderSide(width: 1, color: Colors.white),
+            borderSide: BorderSide(width: 1, color: Colors.white),
           ),
         ),
       ),
@@ -118,7 +124,26 @@ class _SigninPageState extends State<SigninPage> {
                   Color(0xfffd746c)
                 ])),
             child:
-                "Sign Up".text.bold.xl.white.makeCentered())
-        .wFourFifth(context);
+                "Log In".text.bold.xl.white.makeCentered())
+        .wFourFifth(context)
+        .onInkTap(() async {
+          setState(() {loadCircle = true;});
+          try {
+            UserCredential userCredential =
+                await firebaseAuth.signInWithEmailAndPassword(
+                    email: _emailController.text,
+                    password: _passwordController.text);
+                print(userCredential);
+                final snackBar = SnackBar(content: "Login Successful".text.make());
+                ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
+                setState(() {loadCircle = false;});
+                await Navigator.pushNamed(context,MyRoutes.HomePageRoute);
+          } catch (e) {
+            final snackBar = SnackBar(content: e.toString().split("]")[1].text.make());
+            ScaffoldMessenger.of(context).showSnackBar(snackBar);
+            setState(() {loadCircle = false;});
+          }
+       });
   }
 }
