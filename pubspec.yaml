@@ -32,8 +32,10 @@ dependencies:
   firebase_core: ^1.10.6
   flutter:
     sdk: flutter
+  flutter_secure_storage: ^5.0.2
   flutter_svg: ^1.0.0
   google_fonts: ^2.1.1
+  google_sign_in: ^5.2.1
   velocity_x: ^3.3.0
 
 dev_dependencies:

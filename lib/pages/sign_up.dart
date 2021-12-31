@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:todo_app/services/auth_service.dart';
 import 'package:todo_app/utils/routes.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -15,6 +16,7 @@ class SignupPage extends StatefulWidget {
 
 class _SignupPageState extends State<SignupPage> {
   FirebaseAuth firebaseAuth = FirebaseAuth.instance;
+  AuthClass authClass = AuthClass();
 
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -32,10 +34,13 @@ class _SignupPageState extends State<SignupPage> {
               "Sign Up".text.bold.xl4.white.make(),
               SizedBox(height: 50),
               LoginContinueButton(
-                  context, "assets/images/google.svg", "Continue with Google"),
+                  context, "assets/images/google.svg", "Continue with Google",
+                  () async {
+                await authClass.googleSignIn(context);
+              }),
               SizedBox(height: 10),
-              LoginContinueButton(
-                  context, "assets/images/phone.svg", "Continue with Phone"),
+              LoginContinueButton(context, "assets/images/phone.svg",
+                  "Continue with Phone", () => {}),
               SizedBox(height: 25),
               "OR".text.white.bold.make(),
               SizedBox(height: 25),
@@ -49,9 +54,7 @@ class _SignupPageState extends State<SignupPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   "Do you already have an account?".text.white.make(),
-                  SizedBox(
-                    width: 5,
-                  ),
+                  SizedBox(width: 5),
                   "Login".text.white.bold.lg.make().onInkTap(
                       () => Navigator.pushNamed(context, MyRoutes.SigninRoute))
                 ],
@@ -63,8 +66,8 @@ class _SignupPageState extends State<SignupPage> {
     );
   }
 
-  Widget LoginContinueButton(
-      BuildContext context, String imagePath, String displayText) {
+  Widget LoginContinueButton(BuildContext context, String imagePath,
+      String displayText, Function onTapFunction) {
     return Container(
       height: 55,
       child: Card(
@@ -82,7 +85,9 @@ class _SignupPageState extends State<SignupPage> {
           ],
         ),
       ),
-    ).wFourFifth(context);
+    ).wFourFifth(context).onInkTap(() {
+      onTapFunction();
+    });
   }
 
   Widget LoginTextField(BuildContext context, String label,
@@ -119,25 +124,32 @@ class _SignupPageState extends State<SignupPage> {
             child: "Sign Up".text.bold.xl.white.makeCentered())
         .wFourFifth(context)
         .onInkTap(() async {
-          setState(() {loadCircle = true;});
-          try {
-            UserCredential userCredential =
-                await firebaseAuth.createUserWithEmailAndPassword(
-                    email: _emailController.text.trim(),
-                    password: _passwordController.text.trim());
-            final snackBar =
-                SnackBar(content: "Account Creation Successful".text.make());
-                
-            ScaffoldMessenger.of(context).showSnackBar(snackBar);
-            
-            setState(() {loadCircle = false;});
-            await Navigator.pushNamed(context,MyRoutes.HomePageRoute);
-          } catch (e) {
-            final snackBar =
-                SnackBar(content: e.toString().split("]")[1].text.make());
-            ScaffoldMessenger.of(context).showSnackBar(snackBar);
-            setState(() {loadCircle = false;});
-          }
+      setState(() {
+        loadCircle = true;
+      });
+      try {
+        UserCredential userCredential =
+            await firebaseAuth.createUserWithEmailAndPassword(
+                email: _emailController.text.trim(),
+                password: _passwordController.text.trim());
+        authClass.storeLoginToken(userCredential);
+        final snackBar =
+            SnackBar(content: "Account Creation Successful".text.make());
+
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
+        setState(() {
+          loadCircle = false;
         });
+        await Navigator.pushNamed(context, MyRoutes.HomePageRoute);
+      } catch (e) {
+        final snackBar =
+            SnackBar(content: e.toString().split("]")[1].text.make());
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        setState(() {
+          loadCircle = false;
+        });
+      }
+    });
   }
 }
