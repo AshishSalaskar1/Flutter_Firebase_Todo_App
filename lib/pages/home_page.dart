@@ -5,7 +5,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:todo_app/pages/add_todo.dart';
 import 'package:todo_app/pages/sign_in.dart';
+import 'package:todo_app/pages/view_todo.dart';
 import 'package:todo_app/services/auth_service.dart';
+import 'package:todo_app/utils/category_themes.dart';
 import 'package:todo_app/widgets/todo_card.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -28,7 +30,7 @@ class _HomePageState extends State<HomePage> {
       backgroundColor: Color(0xFF1B1A1A),
       appBar: AppBar(
         backgroundColor: Color(0xFF1B1A1A),
-        title: "Todays Schedule".text.xl3.white.make().p8(),
+        title: "My Todos".text.xl3.white.make().p8(),
         actions: [
           CircleAvatar(
             backgroundImage: AssetImage("assets/images/male_avatar.png"),
@@ -42,20 +44,29 @@ class _HomePageState extends State<HomePage> {
           if ((!snapshot.hasData)) {
             return CircularProgressIndicator().centered();
           } else {
-            print("COUNT: " + snapshot.data!.docs.length.toString());
             return ListView.builder(
               itemCount: snapshot.data!.docs.length,
               itemBuilder: (context, index) {
                 Map<String, dynamic> todoMap =
                     snapshot.data!.docs[index].data() as Map<String, dynamic>;
+                // Extract Document ID
                 todoMap["id"] = snapshot.data!.docs[index].id;
+                CategoryIcon? categoryIcon =
+                    CategoryIcons.catMap[todoMap["category"]] ??
+                        CategoryIcons.catMap["other"];
                 return TodoCard(
-                    todoTitle: todoMap["title"] ?? "check",
-                    check: todoMap["check"] ?? true,
-                    todoTime: todoMap["time"] ?? "11 am",
-                    todoIcon: Icons.alarm,
-                    todoIconColor: Colors.white,
-                    todoIconBgColor: Colors.red.shade400);
+                        todoTitle: todoMap["title"] ?? "check",
+                        check: todoMap["completed"] ?? false,
+                        todoTime: todoMap["time"] ?? "11 am",
+                        todoIcon: categoryIcon?.icon ?? Icons.other_houses,
+                        todoIconColor: Colors.white,
+                        todoIconBgColor:
+                            categoryIcon?.iconBgColor ?? Colors.grey.shade300,
+                        todoMap: todoMap,
+                    ).onInkTap(() {
+                        Navigator.push(context,
+                          MaterialPageRoute(builder: (builder) => ViewTodo(todoMap: todoMap)));
+                    });
               },
             );
           }

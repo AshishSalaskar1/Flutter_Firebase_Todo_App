@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors
+// ignore_for_file: prefer_const_constructors, prefer_final_fields
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
@@ -6,19 +6,30 @@ import 'package:flutter/material.dart';
 import 'package:todo_app/pages/home_page.dart';
 import 'package:velocity_x/velocity_x.dart';
 
-class AddTodo extends StatefulWidget {
-  AddTodo({Key? key}) : super(key: key);
+class ViewTodo extends StatefulWidget {
+  ViewTodo({Key? key, required this.todoMap}) : super(key: key);
+
+  final Map<String, dynamic> todoMap;
 
   @override
-  _AddTodoState createState() => _AddTodoState();
+  _ViewTodoState createState() => _ViewTodoState();
 }
 
-class _AddTodoState extends State<AddTodo> {
+class _ViewTodoState extends State<ViewTodo> {
   final FirebaseFirestore firestoreAuth = FirebaseFirestore.instance;
   TextEditingController _titleController = TextEditingController();
   TextEditingController _descriptionController = TextEditingController();
   String selType = "";
   String selCategory = "";
+
+  @override
+  void initState() {
+    super.initState();
+    _titleController.text = widget.todoMap["title"];
+    _descriptionController.text = widget.todoMap["description"];
+    selType = widget.todoMap["type"];
+    selCategory = widget.todoMap["category"];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,13 +46,32 @@ class _AddTodoState extends State<AddTodo> {
               children: [
                 IconButton(
                     onPressed: () {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (builder) => HomePage()));
+                      Navigator.pop(context);
                     },
                     icon: Icon(CupertinoIcons.arrow_left, color: Colors.white)),
-                "Add Todo".text.widest.white.bold.xl4.make().px20(),
+                Row(
+                  children: [
+                    "Edit Todo".text.widest.white.bold.xl4.make().px20(),
+                    Expanded(child: Container()),
+                    IconButton(
+                            onPressed: () {
+                              try {
+                                firestoreAuth.collection("/todo").doc(widget.todoMap["id"]).delete();
+                              }
+                              catch (e) {
+                                final snackBar = SnackBar(content: e.toString().text.make());
+                                ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                              }
+                              Navigator.push(context,
+                                MaterialPageRoute(builder: (builder) => HomePage()));
+                            },
+                            icon: Icon(Icons.delete_forever,
+                                color: Colors.white, size: 30)
+                        ).px12()
+                  ],
+                ),
                 SizedBox(height: 20),
-                "Task Title".text.semiBold.white.make().px20(),
+                "Title".text.semiBold.white.make().px20(),
                 TitleField(context),
                 SizedBox(height: 10),
                 "Task Type".text.semiBold.white.make().px20(),
@@ -79,7 +109,7 @@ class _AddTodoState extends State<AddTodo> {
       height: 50,
       decoration: BoxDecoration(
           color: Color(0xFF7712C9), borderRadius: BorderRadius.circular(15)),
-      child: "Add Todo".text.bold.wide.white.xl.make().centered(),
+      child: "Update".text.bold.wide.white.xl.make().centered(),
     ).wFull(context).px20().onInkTap(() {
       try {
         var todoData = {
@@ -90,11 +120,8 @@ class _AddTodoState extends State<AddTodo> {
           "completed": false
         };
         if (_titleController.text.isNotEmpty) {
-          firestoreAuth.collection("/todo").add(todoData);
-          Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(builder: (builder) => HomePage()),
-              (route) => false);
+          firestoreAuth.collection("/todo").doc(widget.todoMap["id"]).update(todoData);
+          Navigator.pop(context);
         } else {
           final snackBar = SnackBar(
               content: "Please enter a Title for the Todo".text.make());
