@@ -1,5 +1,6 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, use_full_hex_values_for_flutter_colors
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:todo_app/pages/add_todo.dart';
@@ -18,6 +19,8 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final authClass = AuthClass();
   static FirebaseAuth firebaseAuth = FirebaseAuth.instance;
+  final Stream<QuerySnapshot<Map<String, dynamic>>> _firestoreStream =
+      FirebaseFirestore.instance.collection("/todo").snapshots();
 
   @override
   Widget build(BuildContext context) {
@@ -33,21 +36,30 @@ class _HomePageState extends State<HomePage> {
           SizedBox(width: 20)
         ],
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            TodoCard(
-                todoTitle: "Wake me up",
-                todoTime: "12 am",
-                todoIcon: Icons.alarm,
-                todoIconBgColor: Color(0xFFF8D197)),
-            TodoCard(
-                todoTitle: "Purchase Groceries from convenience store",
-                todoTime: "12 am",
-                todoIcon: Icons.shopping_cart,
-                todoIconBgColor: Color(0xFFA5ACF3))
-          ],
-        ).wFull(context).hFull(context),
+      body: StreamBuilder<QuerySnapshot>(
+        stream: _firestoreStream,
+        builder: (context, snapshot) {
+          if ((!snapshot.hasData)) {
+            return CircularProgressIndicator().centered();
+          } else {
+            print("COUNT: " + snapshot.data!.docs.length.toString());
+            return ListView.builder(
+              itemCount: snapshot.data!.docs.length,
+              itemBuilder: (context, index) {
+                Map<String, dynamic> todoMap =
+                    snapshot.data!.docs[index].data() as Map<String, dynamic>;
+                todoMap["id"] = snapshot.data!.docs[index].id;
+                return TodoCard(
+                    todoTitle: todoMap["title"] ?? "check",
+                    check: todoMap["check"] ?? true,
+                    todoTime: todoMap["time"] ?? "11 am",
+                    todoIcon: Icons.alarm,
+                    todoIconColor: Colors.white,
+                    todoIconBgColor: Colors.red.shade400);
+              },
+            );
+          }
+        },
       ),
       bottomNavigationBar:
           BottomNavigationBar(backgroundColor: Color(0xFF1B1A1A), items: [

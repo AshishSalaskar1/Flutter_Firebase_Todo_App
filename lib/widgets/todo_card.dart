@@ -4,17 +4,20 @@ import 'package:flutter/material.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class TodoCard extends StatelessWidget {
-  const TodoCard({
-    Key? key,
-    required this.todoTitle,
-    required this.todoTime, 
-    required this.todoIcon,
-    required this.todoIconBgColor
-  }) : super(key: key);
+  const TodoCard(
+      {Key? key,
+      required this.todoTitle,
+      required this.check,
+      required this.todoTime,
+      required this.todoIcon,
+      required this.todoIconColor,
+      required this.todoIconBgColor})
+      : super(key: key);
 
   final String todoTitle, todoTime;
   final IconData todoIcon;
-  final Color todoIconBgColor;
+  final Color todoIconBgColor, todoIconColor;
+  final bool check;
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +33,7 @@ class TodoCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(5)),
                 activeColor: Color(0xFF00FF6E),
                 checkColor: Color(0xff0e3e26),
-                value: true,
+                value: check,
                 onChanged: (value) {},
               ).scale110()),
           Expanded(
@@ -48,8 +51,8 @@ class TodoCard extends StatelessWidget {
                           borderRadius: BorderRadius.circular(7)),
                       height: 30,
                       width: 30,
-                      child: Icon(todoIcon, color: Colors.black),
-                    ).px12(),
+                      child: Icon(todoIcon, color: todoIconColor),
+                    ).px16(),
                     Expanded(child: todoTitle.text.white.xl.make()),
                     todoTime.text.white.make().px12()
                   ],
