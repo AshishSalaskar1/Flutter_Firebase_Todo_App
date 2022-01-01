@@ -2,6 +2,7 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:todo_app/pages/home_page.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class AddTodo extends StatefulWidget {
@@ -26,9 +27,13 @@ class _AddTodoState extends State<AddTodo> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 IconButton(
-                    onPressed: () {},
+                    onPressed: () {
+                       Navigator.push(context,
+                        MaterialPageRoute(builder: (builder) => HomePage())
+                      );
+                    },
                     icon: Icon(CupertinoIcons.arrow_left, color: Colors.white)),
-                "Create \nNew Todo".text.widest.white.bold.xl4.make().px20(),
+                "Add Todo".text.widest.white.bold.xl4.make().px20(),
                 SizedBox(height: 20),
                 "Task Title".text.semiBold.white.make().px20(),
                 TitleField(context),
