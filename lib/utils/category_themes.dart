@@ -10,7 +10,7 @@ class CategoryIcons {
     "Other": CategoryIcon.init(Icons.push_pin, Color(0xFF7F4BB9)),
     "Shopping": CategoryIcon.init(Icons.shopping_cart, Color(0xFF51C779)),
     "Personal": CategoryIcon.init(Icons.person, Color(0xFFD45CAC)),
-    "Travel": CategoryIcon.init(Icons.airplanemode_on, Color(0xFF0E8191))
+    "Travel": CategoryIcon.init(Icons.airplanemode_on, Color(0xFFC97C18))
   };
 }
 

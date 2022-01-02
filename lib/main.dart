@@ -1,5 +1,6 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:todo_app/pages/add_todo.dart';
@@ -36,7 +37,7 @@ class _MyAppState extends State<MyApp> {
   void checkLogin() async {
     String? token = await authClass.getLoginToken();
     setState(() {
-      if (token == null)
+      if ((token == null) || (FirebaseAuth.instance.currentUser == null))
         homeRoute = SigninPage();
       else
         homeRoute = HomePage();
@@ -46,7 +47,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home:  HomePage(),
+      home: homeRoute,
       routes: {
         MyRoutes.SignupRoute: (context) => SignupPage(),
         MyRoutes.SigninRoute: (context) => SigninPage(),

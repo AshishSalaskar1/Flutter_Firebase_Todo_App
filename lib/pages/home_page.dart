@@ -21,13 +21,12 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final authClass = AuthClass();
   static FirebaseAuth firebaseAuth = FirebaseAuth.instance;
-  final Stream<QuerySnapshot<Map<String, dynamic>>> _firestoreStream =
+  final Stream<QuerySnapshot<Map<String, dynamic>>> _firestoreStream = 
       FirebaseFirestore.instance
       .collection("users")
-      .doc(FirebaseAuth.instance.currentUser!.email.toString())
+      .doc(FirebaseAuth.instance.currentUser?.email.toString())
       .collection("/todo")
       .snapshots();
-
   @override
   void initState() {
     super.initState();

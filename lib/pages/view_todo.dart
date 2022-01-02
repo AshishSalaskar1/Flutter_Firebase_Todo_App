@@ -1,10 +1,11 @@
-// ignore_for_file: prefer_const_constructors, prefer_final_fields
+// ignore_for_file: prefer_const_constructors, prefer_final_fields, curly_braces_in_flow_control_structures
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:todo_app/pages/home_page.dart';
+import 'package:todo_app/utils/date_utils.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class ViewTodo extends StatefulWidget {
@@ -22,6 +23,7 @@ class _ViewTodoState extends State<ViewTodo> {
   TextEditingController _descriptionController = TextEditingController();
   String selType = "";
   String selCategory = "";
+  DateTime selectedDate = DateTime.now();
 
   @override
   void initState() {
@@ -30,6 +32,31 @@ class _ViewTodoState extends State<ViewTodo> {
     _descriptionController.text = widget.todoMap["description"];
     selType = widget.todoMap["type"];
     selCategory = widget.todoMap["category"];
+    selectedDate = DateTime.parse(widget.todoMap["addedDate"].toDate().toString());
+  }
+
+  _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: selectedDate, // Refer step 1
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2025),
+    );
+    if (picked != null && picked != selectedDate)
+      setState(() {
+        selectedDate = picked;
+      });
+  }
+
+  String getDayfromDate(DateTime date) {
+    String res = "";
+    res = res +
+        DateStringUtil.months[date.month] +
+        " " +
+        date.day.toString() +
+        " , " +
+        date.year.toString();
+    return res;
   }
 
   @override
@@ -58,27 +85,34 @@ class _ViewTodoState extends State<ViewTodo> {
                             onPressed: () {
                               try {
                                 firestoreAuth
-                                .collection("users")
-                                .doc(FirebaseAuth.instance.currentUser!.email.toString())
-                                .collection("/todo")
-                                .doc(widget.todoMap["id"])
-                                .delete();
+                                    .collection("users")
+                                    .doc(FirebaseAuth
+                                        .instance.currentUser!.email
+                                        .toString())
+                                    .collection("/todo")
+                                    .doc(widget.todoMap["id"])
+                                    .delete();
+                              } catch (e) {
+                                final snackBar =
+                                    SnackBar(content: e.toString().text.make());
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(snackBar);
                               }
-                              catch (e) {
-                                final snackBar = SnackBar(content: e.toString().text.make());
-                                ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                              }
-                              Navigator.push(context,
-                                MaterialPageRoute(builder: (builder) => HomePage()));
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (builder) => HomePage()));
                             },
                             icon: Icon(Icons.delete_forever,
-                                color: Colors.white, size: 30)
-                        ).px12()
+                                color: Colors.white, size: 30))
+                        .px12()
                   ],
                 ),
                 SizedBox(height: 20),
                 "Title".text.semiBold.white.make().px20(),
                 TitleField(context),
+                SizedBox(height: 10),
+                DatePicker(context),
                 SizedBox(height: 10),
                 "Task Type".text.semiBold.white.make().px20(),
                 Row(
@@ -97,6 +131,7 @@ class _ViewTodoState extends State<ViewTodo> {
                   CategoryChipElement("Work", Color(0xFFB93C66)),
                   CategoryChipElement("Shopping", Color(0xFF2F69B6)),
                   CategoryChipElement("Food", Color(0xFF24AD62)),
+                  CategoryChipElement("Travel", Color(0xFFC97C18)),
                   CategoryChipElement("Other", Color(0xFF2C8588))
                 ]).px20().py4(),
                 SizedBox(height: 20),
@@ -110,6 +145,27 @@ class _ViewTodoState extends State<ViewTodo> {
     );
   }
 
+  Widget DatePicker(BuildContext context) {
+    return Container(
+      child: Row(
+        children: [
+          "Scheduled Date : ".text.white.lg.semiBold.make(),
+          SizedBox(width: 10),
+          getDayfromDate(selectedDate).text.white.make(),
+          SizedBox(width: 10),
+          ElevatedButton(
+              style: ButtonStyle(
+                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(50.0)))),
+              onPressed: () => _selectDate(context),
+              child: Icon(Icons.date_range, color: Colors.white)
+          ),
+        ],
+      ).px20(),
+    );
+  }
+  
   Widget AddTodoButton(BuildContext context) {
     return Container(
       height: 50,
@@ -123,16 +179,17 @@ class _ViewTodoState extends State<ViewTodo> {
           "description": _descriptionController.text,
           "type": selType.isNotEmpty ? selType : "Important",
           "category": selCategory.isNotEmpty ? selCategory : "Other",
-          "completed": false
+          "completed": false,
+          "addedDate": selectedDate
         };
         if (_titleController.text.isNotEmpty) {
           firestoreAuth
-            .collection("users")
-            .doc(FirebaseAuth.instance.currentUser!.email.toString())
-            .collection("/todo")
-            .doc(widget.todoMap["id"])
-            .update(todoData);
-          Navigator.pop(context);
+              .collection("users")
+              .doc(FirebaseAuth.instance.currentUser!.email.toString())
+              .collection("/todo")
+              .doc(widget.todoMap["id"])
+              .update(todoData);
+          Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (x)=>HomePage()), (route) => false);
         } else {
           final snackBar = SnackBar(
               content: "Please enter a Title for the Todo".text.make());

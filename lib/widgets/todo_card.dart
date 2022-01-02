@@ -3,6 +3,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:todo_app/utils/date_utils.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class TodoCard extends StatefulWidget {
@@ -29,11 +30,19 @@ class TodoCard extends StatefulWidget {
 
 class _TodoCardState extends State<TodoCard> {
   bool isChecked = false;
+  DateTime addedDate = DateTime.now();
 
   @override
   void initState() {
     super.initState();
     isChecked = widget.check;
+    addedDate = DateTime.parse(widget.todoMap["addedDate"].toDate().toString());
+  }
+
+  String getDayfromDate(DateTime date) {
+    String res = "";
+    res = date.day.toString() +" "+ DateStringUtil.monthShort[date.month];
+    return res;
   }
 
   @override
@@ -60,7 +69,8 @@ class _TodoCardState extends State<TodoCard> {
                     updatedTodoData.remove("id");
                     FirebaseFirestore.instance
                         .collection("users")
-                        .doc(FirebaseAuth.instance.currentUser!.email.toString())
+                        .doc(
+                            FirebaseAuth.instance.currentUser!.email.toString())
                         .collection("/todo")
                         .doc(docId)
                         .update(updatedTodoData);
@@ -89,7 +99,7 @@ class _TodoCardState extends State<TodoCard> {
                         child: isChecked
                             ? widget.todoTitle.text.lineThrough.white.lg.make()
                             : widget.todoTitle.text.white.lg.make()),
-                    widget.todoTime.text.thin.sm.white.make().px12()
+                    getDayfromDate(addedDate).text.thin.sm.white.make().px12()
                   ],
                 ),
               ),

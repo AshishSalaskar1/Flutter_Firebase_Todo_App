@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:todo_app/pages/home_page.dart';
+import 'package:todo_app/utils/date_utils.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class AddTodo extends StatefulWidget {
@@ -21,21 +22,6 @@ class _AddTodoState extends State<AddTodo> {
   String selType = "";
   String selCategory = "";
   DateTime selectedDate = DateTime.now();
-  List<String> months = [
-    'Dummy',
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December'
-  ];
 
   _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -52,7 +38,7 @@ class _AddTodoState extends State<AddTodo> {
 
   String getDayfromDate(DateTime date) {
     String res = "";
-    res = res + months[date.month] +" "+date.day.toString()+ " , "+date.year.toString();
+    res = res + DateStringUtil.months[date.month] +" "+date.day.toString()+ " , "+date.year.toString();
     return res;
   }
 
@@ -99,6 +85,7 @@ class _AddTodoState extends State<AddTodo> {
                   CategoryChipElement("Work", Color(0xFFB93C66)),
                   CategoryChipElement("Shopping", Color(0xFF2F69B6)),
                   CategoryChipElement("Food", Color(0xFF24AD62)),
+                  CategoryChipElement("Travel", Color(0xFFC97C18)),
                   CategoryChipElement("Other", Color(0xFF2C8588))
                 ]).px20().py4(),
                 SizedBox(height: 20),
@@ -116,7 +103,7 @@ class _AddTodoState extends State<AddTodo> {
     return Container(
       child: Row(
         children: [
-          "Day : ".text.white.semiBold.make(),
+          "Scheduled Date : ".text.white.lg.semiBold.make(),
           SizedBox(width: 10),
           getDayfromDate(selectedDate).text.white.make(),
           SizedBox(width: 10),
@@ -126,7 +113,8 @@ class _AddTodoState extends State<AddTodo> {
                       RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(50.0)))),
               onPressed: () => _selectDate(context),
-              child: Icon(Icons.date_range, color: Colors.white)),
+              child: Icon(Icons.date_range, color: Colors.white)
+          ),
         ],
       ).px20(),
     );
