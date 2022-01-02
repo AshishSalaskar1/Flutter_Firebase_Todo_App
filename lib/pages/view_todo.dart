@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors, prefer_final_fields
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:todo_app/pages/home_page.dart';
@@ -56,7 +57,12 @@ class _ViewTodoState extends State<ViewTodo> {
                     IconButton(
                             onPressed: () {
                               try {
-                                firestoreAuth.collection("/todo").doc(widget.todoMap["id"]).delete();
+                                firestoreAuth
+                                .collection("users")
+                                .doc(FirebaseAuth.instance.currentUser!.email.toString())
+                                .collection("/todo")
+                                .doc(widget.todoMap["id"])
+                                .delete();
                               }
                               catch (e) {
                                 final snackBar = SnackBar(content: e.toString().text.make());
@@ -120,7 +126,12 @@ class _ViewTodoState extends State<ViewTodo> {
           "completed": false
         };
         if (_titleController.text.isNotEmpty) {
-          firestoreAuth.collection("/todo").doc(widget.todoMap["id"]).update(todoData);
+          firestoreAuth
+            .collection("users")
+            .doc(FirebaseAuth.instance.currentUser!.email.toString())
+            .collection("/todo")
+            .doc(widget.todoMap["id"])
+            .update(todoData);
           Navigator.pop(context);
         } else {
           final snackBar = SnackBar(

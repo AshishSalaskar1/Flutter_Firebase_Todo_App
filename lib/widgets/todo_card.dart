@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors, sized_box_for_whitespace
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:velocity_x/velocity_x.dart';
 
@@ -58,6 +59,8 @@ class _TodoCardState extends State<TodoCard> {
                     updatedTodoData["completed"] = isChecked;
                     updatedTodoData.remove("id");
                     FirebaseFirestore.instance
+                        .collection("users")
+                        .doc(FirebaseAuth.instance.currentUser!.email.toString())
                         .collection("/todo")
                         .doc(docId)
                         .update(updatedTodoData);

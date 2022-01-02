@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:todo_app/pages/home_page.dart';
@@ -90,7 +91,11 @@ class _AddTodoState extends State<AddTodo> {
           "completed": false
         };
         if (_titleController.text.isNotEmpty) {
-          firestoreAuth.collection("/todo").add(todoData);
+          firestoreAuth
+            .collection("users")
+            .doc(FirebaseAuth.instance.currentUser!.email.toString())
+            .collection("/todo")
+            .add(todoData);
           Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(builder: (builder) => HomePage()),

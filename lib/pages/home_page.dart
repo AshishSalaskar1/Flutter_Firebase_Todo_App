@@ -22,7 +22,16 @@ class _HomePageState extends State<HomePage> {
   final authClass = AuthClass();
   static FirebaseAuth firebaseAuth = FirebaseAuth.instance;
   final Stream<QuerySnapshot<Map<String, dynamic>>> _firestoreStream =
-      FirebaseFirestore.instance.collection("/todo").snapshots();
+      FirebaseFirestore.instance
+      .collection("users")
+      .doc(FirebaseAuth.instance.currentUser!.email.toString())
+      .collection("/todo")
+      .snapshots();
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,18 +64,20 @@ class _HomePageState extends State<HomePage> {
                     CategoryIcons.catMap[todoMap["category"]] ??
                         CategoryIcons.catMap["other"];
                 return TodoCard(
-                        todoTitle: todoMap["title"] ?? "check",
-                        check: todoMap["completed"] ?? false,
-                        todoTime: todoMap["time"] ?? "11 am",
-                        todoIcon: categoryIcon?.icon ?? Icons.other_houses,
-                        todoIconColor: Colors.white,
-                        todoIconBgColor:
-                            categoryIcon?.iconBgColor ?? Colors.grey.shade300,
-                        todoMap: todoMap,
-                    ).onInkTap(() {
-                        Navigator.push(context,
-                          MaterialPageRoute(builder: (builder) => ViewTodo(todoMap: todoMap)));
-                    });
+                  todoTitle: todoMap["title"] ?? "check",
+                  check: todoMap["completed"] ?? false,
+                  todoTime: todoMap["time"] ?? "11 am",
+                  todoIcon: categoryIcon?.icon ?? Icons.other_houses,
+                  todoIconColor: Colors.white,
+                  todoIconBgColor:
+                      categoryIcon?.iconBgColor ?? Colors.grey.shade300,
+                  todoMap: todoMap,
+                ).onInkTap(() {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (builder) => ViewTodo(todoMap: todoMap)));
+                });
               },
             );
           }
@@ -76,9 +87,15 @@ class _HomePageState extends State<HomePage> {
           BottomNavigationBar(backgroundColor: Color(0xFF1B1A1A), items: [
         BottomNavigationBarItem(
             icon: IconButton(
-                onPressed: () {},
-                icon: Icon(Icons.home, color: Colors.white, size: 28)),
-            title: Container()),
+                onPressed: () async {
+                  await authClass.logOut();
+                  Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (builder) => SigninPage()),
+                      (route) => false);
+                },
+                icon: Icon(Icons.logout, color: Colors.white, size: 28)),
+            title: Container(child: "Logout".text.white.sm.make())),
         BottomNavigationBarItem(
             icon: Container(
               height: 48,
@@ -100,7 +117,9 @@ class _HomePageState extends State<HomePage> {
             icon: IconButton(
                 onPressed: () {},
                 icon: Icon(Icons.settings, color: Colors.white, size: 28)),
-            title: Container())
+            title: Container(
+              child: "Settings".text.white.sm.make(),
+            ))
       ]),
     );
   }
