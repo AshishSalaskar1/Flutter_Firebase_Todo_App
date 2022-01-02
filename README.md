@@ -1,16 +1,18 @@
-# todo_app
+# flutter_catalog
 
-A new Flutter project.
+A flutter basic project created to emulate a Ecommerce Site.
+### Pages/Screens Implemented :
+- Login
+- Product Catalog List 
+- Details of item
+- Cart page with `Add to Cart` options
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### Screenshots
+<p float="left">
+  <img src="https://github.com/AshishSalaskar1/Flutter_Catalog_App/blob/main/git_files/login.png" alt="Login_Page" width="250" height="500"/>
+  <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+  <img src="https://github.com/AshishSalaskar1/Flutter_Catalog_App/blob/main/git_files/home_page.png" alt="Home_Page" width="250" height="500"/>
+  <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+  <img src="https://github.com/AshishSalaskar1/Flutter_Catalog_App/blob/main/git_files/item_details.png" alt="Item_Details_Page" width="250" height="500"/>
+</p>
+         

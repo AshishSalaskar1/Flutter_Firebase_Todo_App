@@ -53,12 +53,6 @@ class AuthClass {
         key: "token", value: userCredential.credential?.token.toString());
     await secureStorage.write(
         key: "userCredential", value: userCredential.toString());
-
-    print(userCredential.credential?.token.toString());
-    print(userCredential.toString());
-
-    String? token = await getLoginToken();
-    print(token);
   }
 
   Future<String?> getLoginToken() async {
