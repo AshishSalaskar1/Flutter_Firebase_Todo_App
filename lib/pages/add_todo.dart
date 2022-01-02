@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors
+// ignore_for_file: prefer_const_constructors, curly_braces_in_flow_control_structures
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -20,6 +20,41 @@ class _AddTodoState extends State<AddTodo> {
   TextEditingController _descriptionController = TextEditingController();
   String selType = "";
   String selCategory = "";
+  DateTime selectedDate = DateTime.now();
+  List<String> months = [
+    'Dummy',
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December'
+  ];
+
+  _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: selectedDate, // Refer step 1
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2025),
+    );
+    if (picked != null && picked != selectedDate)
+      setState(() {
+        selectedDate = picked;
+      });
+  }
+
+  String getDayfromDate(DateTime date) {
+    String res = "";
+    res = res + months[date.month] +" "+date.day.toString()+ " , "+date.year.toString();
+    return res;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,6 +80,8 @@ class _AddTodoState extends State<AddTodo> {
                 "Task Title".text.semiBold.white.make().px20(),
                 TitleField(context),
                 SizedBox(height: 10),
+                DatePicker(context),
+                SizedBox(height: 10),
                 "Task Type".text.semiBold.white.make().px20(),
                 Row(
                   children: [
@@ -66,12 +103,32 @@ class _AddTodoState extends State<AddTodo> {
                 ]).px20().py4(),
                 SizedBox(height: 20),
                 AddTodoButton(context),
-                SizedBox(height: 80)
+                SizedBox(height: 80),
               ],
             ),
           ),
         ).hFull(context).wFull(context),
       ),
+    );
+  }
+
+  Widget DatePicker(BuildContext context) {
+    return Container(
+      child: Row(
+        children: [
+          "Day : ".text.white.semiBold.make(),
+          SizedBox(width: 10),
+          getDayfromDate(selectedDate).text.white.make(),
+          SizedBox(width: 10),
+          ElevatedButton(
+              style: ButtonStyle(
+                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(50.0)))),
+              onPressed: () => _selectDate(context),
+              child: Icon(Icons.date_range, color: Colors.white)),
+        ],
+      ).px20(),
     );
   }
 
@@ -88,14 +145,15 @@ class _AddTodoState extends State<AddTodo> {
           "description": _descriptionController.text,
           "type": selType.isNotEmpty ? selType : "Important",
           "category": selCategory.isNotEmpty ? selCategory : "Other",
-          "completed": false
+          "completed": false,
+          "addedDate": selectedDate
         };
         if (_titleController.text.isNotEmpty) {
           firestoreAuth
-            .collection("users")
-            .doc(FirebaseAuth.instance.currentUser!.email.toString())
-            .collection("/todo")
-            .add(todoData);
+              .collection("users")
+              .doc(FirebaseAuth.instance.currentUser!.email.toString())
+              .collection("/todo")
+              .add(todoData);
           Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(builder: (builder) => HomePage()),
